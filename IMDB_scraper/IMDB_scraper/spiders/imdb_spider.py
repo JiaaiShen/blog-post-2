@@ -21,8 +21,6 @@ class ImdbSpider(scrapy.Spider):
         """
         """
 
-        current = response.url
-
         links = [a.attrib["href"] for a in response.css("td.primary_photo a")]
 
         for link in links:
@@ -33,4 +31,3 @@ class ImdbSpider(scrapy.Spider):
         """
         """
 
-        
