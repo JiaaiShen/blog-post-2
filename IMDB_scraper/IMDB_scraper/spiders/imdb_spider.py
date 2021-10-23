@@ -24,4 +24,4 @@ class ImdbSpider(scrapy.Spider):
         links = [a.attrib["href"] for a in response.css("td.primary_photo a")]
 
         for link in links:
-            
+            yield scrapy.Request(link, callback = self.parse_actor_page)
