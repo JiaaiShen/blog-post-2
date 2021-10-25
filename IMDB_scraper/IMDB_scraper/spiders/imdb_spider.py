@@ -12,22 +12,38 @@ class ImdbSpider(scrapy.Spider):
         """
         """
 
-        next_page = response.urljoin('fullcredits/')
+        full_credits = response.url + 'fullcredits/'
 
-        yield scrapy.Request(next_page, callback = self.parse_full_credits)
+        yield scrapy.Request(full_credits, callback = self.parse_full_credits)
 
 
     def parse_full_credits(self, response):
         """
         """
 
-        links = [a.attrib["href"] for a in response.css("td.primary_photo a")]
+        paths = [a.attrib["href"] for a in response.css("td.primary_photo a")]
 
-        for link in links:
-            yield scrapy.Request(link.url, callback = self.parse_actor_page)
+        for path in paths:
+            actor_page = response.urljoin(path)
+
+            yield scrapy.Request(actor_page, callback = self.parse_actor_page)
 
     
     def parse_actor_page(self, response):
         """
         """
 
+        overview = response.css("div#name-overview-widget")
+
+        actor = overview.css("span.itemprop::text").get()
+
+        for film in response.css("div.filmo-row"):
+
+            category = film.css("::attr(id)").get()
+
+            if ("actor" in category) or ("actress" in category):
+
+                movie_or_TV_name = film.css("a::text").get()
+
+                yield {"actor" : actor,
+                       "movie_or_TV_name" : movie_or_TV_name}
